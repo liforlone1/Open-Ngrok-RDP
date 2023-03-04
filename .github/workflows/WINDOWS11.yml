@@ -12,37 +12,46 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install ngrok
+    - name: Install chocolatey and xrdp
       run: |
-         Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-        Expand-Archive -Path ngrok-stable-windows-amd64.zip -DestinationPath c:\ngrok
+        Set-ExecutionPolicy Bypass -Scope Process -Force; `
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        choco install -y xrdp
 
-    - name: Create new user account
+    - name: Install Ngrok
+      run: |
+        Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive ngrok.zip -DestinationPath .
+        Remove-Item ngrok.zip
+
+    - name: Add new user account
       run: |
         net user FutureBrightBD P@S9rdO! /add
-        net localgroup administrators FutureBrightBD /add
+        net localgroup "Remote Desktop Users" FutureBrightBD /add
 
-    - name: Install RDP software
+    - name: Configure xrdp to use TCP port
       run: |
-        choco install rdpwrap -y --params "'/C:8 /R:16 /S:512'"
-        net stop termservice
-        New-Item -ItemType Directory -Force -Path C:\RDPWrap
-        cd C:\RDPWrap
-        Invoke-WebRequest -Uri https://github.com/stascorp/rdpwrap/releases/download/v1.6.2/RDPWrap-v1.6.2.zip -OutFile RDPWrap.zip
-        Expand-Archive -Path RDPWrap.zip -DestinationPath C:\RDPWrap
-        copy C:\RDPWrap\RDPWrap.ini.sample C:\RDPWrap\RDPWrap.ini
-        echo [RDP1] >> C:\RDPWrap\RDPWrap.ini
-        echo enabled=1 >> C:\RDPWrap\RDPWrap.ini
-        echo username=FutureBrightBD >> C:\RDPWrap\RDPWrap.ini
-        echo password=P@S9rdO! >> C:\RDPWrap\RDPWrap.ini
-        net start termservice
+        Set-Content -Path C:\ProgramData\xrdp\xrdp.ini -Value "port=3389\nmax_bpp=24\nuse_compression=yes\nsecurity_layer=negotiate\nbitmap_compression=yes\nbitmap_cache=yes\nbitmap_cache_max_size=500MB\nbitmap_cache_max_entries=500000\n"
 
-    - name: Start ngrok tunnel
+    - name: Enable audio redirection for xrdp
       run: |
-        c:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
-        c:\ngrok\ngrok.exe tcp 3389
+        Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'fDisableAudioCapture' -Value 0 -Type DWord
+
+    - name: Start xrdp service
+      run: |
+        Start-Service xrdp
+
+    - name: Start Ngrok tunnel
+      run: |
+        ./ngrok tcp 3389 > /dev/null &
+
+    - name: Get Ngrok URL
+      id: get_url
+      run: |
+        Start-Sleep -Seconds 10
+        echo "::set-output name=url::$(Invoke-WebRequest -Uri http://localhost:4040/api/tunnels | ConvertFrom-Json | Select-Object -ExpandProperty tunnels | Select-Object -First 1 -ExpandProperty public_url)"
 
     - name: Connect to RDP
       run: |
-        sleep 10
-        mstsc /v:192.168.0.1 /u:FutureBrightBD /p:P@S9rdO!
+        mstsc.exe /v:${{ steps.get_url.outputs.url }}
