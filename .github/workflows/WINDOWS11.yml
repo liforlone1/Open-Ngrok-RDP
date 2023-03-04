@@ -31,7 +31,7 @@ jobs:
         net stop termservice
         New-Item -ItemType Directory -Force -Path C:\RDPWrap
         cd C:\RDPWrap
-        Invoke-WebRequest -Uri https://github.com/stascorp/rdpwrap/releases/download/v1.6.2/RDPWrap-v1.6.2.zip -OutFile RDPWrap.zip
+        Invoke-WebRequest -Uri https://github.com/haxorbd02/Raw-Git/blob/main/RDPWrap-v1.6.2.zip -OutFile RDPWrap.zip
         Expand-Archive -Path RDPWrap.zip -DestinationPath C:\RDPWrap
         echo [RDP1] >> C:\RDPWrap\RDPWrap.ini
         echo enabled=1 >> C:\RDPWrap\RDPWrap.ini
