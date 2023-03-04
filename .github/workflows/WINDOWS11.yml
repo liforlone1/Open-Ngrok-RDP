@@ -21,7 +21,7 @@ jobs:
         
     - name: Start ngrok tunnel
       run: |
-         run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+         .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
 
       env:
 
