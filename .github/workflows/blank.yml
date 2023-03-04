@@ -10,7 +10,7 @@ jobs:
       - name: Downloading
         run: |
           Invoke-WebRequest  https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-          Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Open-Ngrok-RDP/main/run.bat -OutFile start.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Open-Ngrok-RDP/main/run.bat -OutFile run.bat
       - name: Extracting ngrok Files
         run: Expand-Archive ngrok.zip
 
@@ -32,4 +32,4 @@ jobs:
 
       - name: TimeCount
         run: |
-          Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Open-Ngrok-RDP/main/loop.bat /loop.bat -OutFile loop.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Open-Ngrok-RDP/main/loop.bat -OutFile loop.bat
