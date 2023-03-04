@@ -14,7 +14,7 @@ jobs:
 
     - name: Install ngrok
       run: |
-        wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip
+        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip
         Expand-Archive -Path ngrok-stable-windows-amd64.zip -DestinationPath c:\ngrok
 
     - name: Create new user account
