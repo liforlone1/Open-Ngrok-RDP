@@ -20,8 +20,7 @@ jobs:
       run: Expand-Archive ngrok.zip
         
     - name: Start ngrok tunnel
-      run: |
-         .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      run: 
 
       env:
 
