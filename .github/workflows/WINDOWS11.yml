@@ -14,7 +14,7 @@ jobs:
 
     - name: Install ngrok
       run: |
-        Invoke-WebRequest https://github.com/haxorbd02/Raw-Git/blob/main/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
 
     - name: Extract
 
