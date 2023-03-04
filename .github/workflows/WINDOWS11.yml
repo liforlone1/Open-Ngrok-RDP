@@ -15,25 +15,30 @@ jobs:
     - name: Install ngrok
       run: |
         Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive ngrok.zip c:\ngrok
 
-    - name: Extract
-      run: Expand-Archive ngrok.zip
-        
+    - name: Create new user account
+      run: |
+        net user FutureBrightBD P@S9rdO! /add
+        net localgroup administrators FutureBrightBD /add
+
+    - name: Install RDP software
+      run: |
+        choco install rdpwrap -y --params "'/C:8 /R:16 /S:512'"
+        net stop termservice
+        copy C:\RDPWrap\RDPWrap.ini C:\RDPWrap\RDPWrap.bak
+        echo [RDP1] >> C:\RDPWrap\RDPWrap.ini
+        echo enabled=1 >> C:\RDPWrap\RDPWrap.ini
+        echo username=FutureBrightBD >> C:\RDPWrap\RDPWrap.ini
+        echo password=P@S9rdO! >> C:\RDPWrap\RDPWrap.ini
+        net start termservice
+
     - name: Start ngrok tunnel
-      run: 
-
-      env:
-
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        
-    - name: Enable TS
-      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
-      
-    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+      run: |
+        c:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
+        c:\ngrok\ngrok.exe tcp 3389
 
     - name: Connect to RDP
       run: |
         sleep 10
         mstsc /v:192.168.0.1 /u:FutureBrightBD /p:P@S9rdO!
-
