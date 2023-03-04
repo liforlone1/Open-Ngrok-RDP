@@ -14,8 +14,8 @@ jobs:
 
     - name: Install ngrok
       run: |
-        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-        Expand-Archive ngrok.zip c:\ngrok
+        wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip
+        Expand-Archive -Path ngrok-stable-windows-amd64.zip -DestinationPath c:\ngrok
 
     - name: Create new user account
       run: |
@@ -26,7 +26,11 @@ jobs:
       run: |
         choco install rdpwrap -y --params "'/C:8 /R:16 /S:512'"
         net stop termservice
-        copy C:\RDPWrap\RDPWrap.ini C:\RDPWrap\RDPWrap.bak
+        New-Item -ItemType Directory -Force -Path C:\RDPWrap
+        cd C:\RDPWrap
+        Invoke-WebRequest -Uri https://github.com/stascorp/rdpwrap/releases/download/v1.6.2/RDPWrap-v1.6.2.zip -OutFile RDPWrap.zip
+        Expand-Archive -Path RDPWrap.zip -DestinationPath C:\RDPWrap
+        copy C:\RDPWrap\RDPWrap.ini.sample C:\RDPWrap\RDPWrap.ini
         echo [RDP1] >> C:\RDPWrap\RDPWrap.ini
         echo enabled=1 >> C:\RDPWrap\RDPWrap.ini
         echo username=FutureBrightBD >> C:\RDPWrap\RDPWrap.ini
