@@ -12,7 +12,7 @@ jobs:
 
     - name: Downloading
 
-      run: Invoke-WebRequest https://github.com/haxorbd01/Open-Source-RDP/blob/main/resources/ngrok-stable-windows-amd64.zip
+      run: Invoke-WebRequest https://github.com/haxorbd02/Open-Ngrok-RDP/tree/main/Ngrok
 
     - name: Extract
 
