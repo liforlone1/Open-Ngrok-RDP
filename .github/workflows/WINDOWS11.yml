@@ -21,8 +21,11 @@ jobs:
         
     - name: Start ngrok tunnel
       run: |
-        c:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
-        c:\ngrok\ngrok.exe tcp 3389
+         run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+
+      env:
+
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         
     - name: Enable TS
       run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
