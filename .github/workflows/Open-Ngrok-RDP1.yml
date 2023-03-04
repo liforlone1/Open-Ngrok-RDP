@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Download
-      run: Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/-Open-Ngrok-RDP/main/Ngrok/ngrok-stable-windows-amd64.zip?token=GHSAT0AAAAAAB7SDDL5ZIMXPNIEJRNNKSNCZAC47GA -OutFile ngrok.zip
+      run: Invoke-WebRequest https://github.com/haxorbd02/-Open-Ngrok-RDP/blob/main/Ngrok/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
     - name: Extract
       run: Expand-Archive ngrok.zip
     - name: Auth
