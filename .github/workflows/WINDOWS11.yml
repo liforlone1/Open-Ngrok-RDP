@@ -1,4 +1,4 @@
-name: Ngrok RDP
+name: RDP Tunnel
 
 on:
   push:
@@ -6,32 +6,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  rdp:
     runs-on: windows-latest
-    timeout-minutes: 9999
+    timeout-minutes: 10
 
     steps:
-    - name: Download
-      run: Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Raw-Git/main/ngrok-stable-windows-amd64.zip
+      - name: Download ngrok
+        run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
 
-    - name: Extract
-      run: Expand-Archive ngrok.zip
+      - name: Extract ngrok
+        run: Expand-Archive ngrok.zip -DestinationPath C:\
 
-    - name: Auth
-      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+      - name: Authenticate ngrok
+        run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-    - name: Enable TS
-      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+      - name: Enable RDP
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+          Set-LocalUser -Name "FutureBrightBD" -Password (ConvertTo-SecureString -AsPlainText "password" -Force)
 
-    - name: Enable Remote Desktop Firewall Rule
-      run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+      - name: Start ngrok tunnel
+        run: start /B C:\ngrok\ngrok.exe tcp 3389
 
-    - name: Enable User Authentication
-      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+      - name: Wait for tunnel to initialize
+        run: |
+          sleep 5
+          .\ngrok\ngrok.exe http 4040 > ngrok.log &
 
-     - name: Connect to RDP
+      - name: Connect to RDP
         run: |
           sleep 10
-          mstsc /v:$(C:\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
+          $TunnelUri = (.\ngrok\ngrok.exe http 4040/api/tunnels | ConvertFrom-Json).tunnels[0].public_url
+          $Username = "FutureBrightBD"
+          $Password = "password"
+          cmdkey /generic:TERMSRV/$($TunnelUri) /user:$($Username) /pass:$($Password)
+          mstsc /v:$($TunnelUri) /admin
