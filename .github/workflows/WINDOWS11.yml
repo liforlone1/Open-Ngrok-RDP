@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Download
-      run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+      run: Invoke-WebRequest https://raw.githubusercontent.com/haxorbd02/Raw-Git/main/ngrok-stable-windows-amd64.zip
 
     - name: Extract
       run: Expand-Archive ngrok.zip
@@ -31,7 +31,7 @@ jobs:
     - name: Enable User Authentication
       run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
 
-    - name: Connect to RDP
-        run
+     - name: Connect to RDP
+        run: |
           sleep 10
           mstsc /v:$(C:\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
