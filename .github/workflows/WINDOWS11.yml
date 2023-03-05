@@ -34,7 +34,7 @@ jobs:
       - name: Set Local User Password
         run: |
           sleep 10
-          mstsc /v:127.0.0.1 )/u:FutureBrightBD /p:P@S9rdO!
+          mstsc /v:127.0.0.1 /u:FutureBrightBD /p:P@S9rdO!
 
       - name: Create Tunnel
         run: .\ngrok\ngrok.exe tcp 3389
