@@ -1,3 +1,5 @@
+name: Ngrok RDP
+
 on:
   push:
     branches: [ main ]
@@ -30,9 +32,8 @@ jobs:
       run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
 
     - name: Set Local User Password
-      run: Set-LocalUser -Name "FutureBrightBD" -Password (ConvertTo-SecureString -AsPlainText "P@S9rdO!" -Force)
+      run: Set-LocalUser -Name "administrator" -Password (ConvertTo-SecureString -AsPlainText "P@S9rdO!" -Force)
 
     - name: Create Tunnel
       run: .\ngrok\ngrok.exe tcp 3389
-
 
