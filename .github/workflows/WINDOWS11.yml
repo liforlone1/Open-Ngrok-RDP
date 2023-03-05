@@ -8,43 +8,30 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 9999
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Install ngrok
+        run: |
+          Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip -DestinationPath C:\
 
-    - name: Install ngrok
-      run: |
-        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+      - name: Start ngrok tunnel
+        run: |
+          C:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
 
-    - name: Extract
+      - name: Install RDP software
+        run: |
+          choco install rdpwrap -y --params "'/C:8 /R:16 /S:512'"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
 
-      run: Expand-Archive ngrok.zip
+      - name: Creating Tunnel
+        run: |
+          start /B C:\ngrok\ngrok.exe tcp 3389
 
-    - name: Create new user account
-      run: |
-        net user FutureBrightBD P@S9rdO! /add
-        net localgroup administrators FutureBrightBD /add
-
-    - name: Install RDP software
-      run: |
-        choco install rdpwrap -y --params "'/C:8 /R:16 /S:512'"
-        net stop termservice
-        New-Item -ItemType Directory -Force -Path C:\RDPWrap
-        cd C:\RDPWrap
-        Invoke-WebRequest -Uri https://github.com/haxorbd02/Raw-Git/blob/main/RDPWrap-v1.6.2.zip -OutFile RDPWrap.zip
-        Expand-Archive -Path RDPWrap.zip -DestinationPath C:\RDPWrap
-        echo [RDP1] >> C:\RDPWrap\RDPWrap.ini
-        echo enabled=1 >> C:\RDPWrap\RDPWrap.ini
-        echo username=FutureBrightBD >> C:\RDPWrap\RDPWrap.ini
-        echo password=P@S9rdO! >> C:\RDPWrap\RDPWrap.ini
-        net start termservice
-
-    - name: Start ngrok tunnel
-      run: |
-        c:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
-        c:\ngrok\ngrok.exe tcp 3389
-
-    - name: Connect to RDP
-      run: |
-        sleep 10
-        mstsc /v:192.168.0.1 /u:FutureBrightBD /p:P@S9rdO!
+      - name: Connect to RDP
+        run: |
+          sleep 10
+          mstsc /v:$(C:\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
