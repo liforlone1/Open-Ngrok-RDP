@@ -1,5 +1,3 @@
-name: Ngrok RDP
-
 on:
   push:
     branches: [ main ]
@@ -36,4 +34,4 @@ jobs:
       - name: Connect to RDP
         run: |
           sleep 10
-          mstsc /v:$(.\ngrok\ngrok.exe http 3389 | Select-String -Pattern 'tcp://(.*):' | ForEach-Object { $_.Matches.Groups[1].Value }) /u:FutureBrightBD /p:P@S9rdO!
+          mstsc /v:$(.\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
