@@ -8,20 +8,29 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 9999
     steps:
+    
       - name: Download ngrok
+      
         run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
       - name: Extract ngrok
+      
         run: Expand-Archive ngrok.zip -DestinationPath C:\
+        
       - name: Auth
+      
         run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Enable RDP
+      
         run: |
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
           Set-LocalUser -Name "FutureBrightBD" -Password (ConvertTo-SecureString -AsPlainText "P@S9rdO!" -Force)
+          
       - name: Create Tunnel
+      
         run: start /B C:\ngrok\ngrok.exe tcp 3389
 
