@@ -32,9 +32,7 @@ jobs:
         run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
 
       - name: Set Local User Password
-        run: |
-          sleep 10
-          mstsc /v:127.0.0.1 /u:FutureBrightBD /p:P@S9rdO!
-
+        run: Set-LocalUser -Name "administrator" -Password (ConvertTo-SecureString -AsPlainText "P@S9rdO!" -Force)
+        
       - name: Create Tunnel
         run: .\ngrok\ngrok.exe tcp 3389
