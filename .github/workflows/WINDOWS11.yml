@@ -31,10 +31,10 @@ jobs:
       - name: Enable User Authentication
         run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
 
-      - name: Connect to RDP
+      - name: Set Local User Password
         run: |
           sleep 10
-          mstsc /v:$(.\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
+          mstsc /v:127.0.0.1 )/u:FutureBrightBD /p:P@S9rdO!
 
       - name: Create Tunnel
         run: .\ngrok\ngrok.exe tcp 3389
