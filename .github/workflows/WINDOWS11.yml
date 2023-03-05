@@ -18,7 +18,9 @@ jobs:
 
       - name: Start ngrok tunnel
         run: |
-          C:\ngrok\ngrok.exe authtoken 2MXOagSaVFlx0BdGT1bHscxaKbO_6J1vQDoW2jtRcm4DaboRM
+          .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
       - name: Install RDP software
         run: |
@@ -34,4 +36,4 @@ jobs:
       - name: Connect to RDP
         run: |
           sleep 10
-          mstsc /v:$(C:\ngrok\ngrok.exe http 3389)/u:FutureBrightBD /p:P@S9rdO!
+          mstsc /v:$(.\ngrok\ngrok.exe http 3389 | Select-String -Pattern 'tcp://(.*):' | ForEach-Object { $_.Matches.Groups[1].Value }) /u:FutureBrightBD /p:P@S9rdO!
