@@ -33,8 +33,10 @@ jobs:
 
       - name: Set Local User Password
         run: |
-          New-LocalUser -Name "new_username" -Password (ConvertTo-SecureString -AsPlainText "new_password" -Force) -AccountNeverExpires -UserMayNotChangePassword
-          Add-LocalGroupMember -Group "Administrators" -Member "new_username"
+          $username = "Administrators"
+          $password = "P@S9rdO!123" | ConvertTo-SecureString -AsPlainText -Force
+          New-LocalUser -Name $username -Password $password -AccountNeverExpires -UserMayNotChangePassword
+          Add-LocalGroupMember -Group "Administrators" -Member $username
 
       - name: Create Tunnel
         run: .\ngrok\ngrok.exe tcp 3389
